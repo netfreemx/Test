@@ -45,9 +45,10 @@ public class NotificationService extends FirebaseMessagingService implements App
         }
 
         try {
-            byte[] rawData = message.getRawData();
-            String data = new String(rawData, StandardCharsets.UTF_8);
-            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data",data));
+            String rawData = gson.toJson(message.getData());
+            Data notificationData = gson.fromJson(rawData, Data.class);
+            showNotification(notificationData);
+            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data",rawData));
         } catch (Exception e) {
             ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data", e.getMessage()));
         }
