@@ -31,6 +31,8 @@ import com.netfreemexico.notificationutils.Utils;
 import com.netfreemexico.notificationutils.constants.AppConstants;
 import com.netfreemexico.notificationutils.model.Data;
 
+import java.nio.charset.StandardCharsets;
+
 public class NotificationService extends FirebaseMessagingService implements AppConstants {
     private final Gson gson = new Gson();
     public static final String NOTIFICATION_ICON = "notification_icon";
@@ -42,8 +44,14 @@ public class NotificationService extends FirebaseMessagingService implements App
             return;
         }
 
-        String result = message.getData().toString();
-        ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data",result));
+        try {
+            byte[] rawData = message.getRawData();
+            String data = new String(rawData, StandardCharsets.UTF_8);
+            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data",data));
+        } catch (Exception e) {
+            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data", e.getMessage()));
+        }
+
     }
 
     @Override
