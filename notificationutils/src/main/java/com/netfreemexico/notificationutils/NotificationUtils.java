@@ -9,23 +9,31 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.netfreemexico.notificationutils.constants.AppConstants;
+import com.netfreemexico.notificationutils.util.Utils;
 
 public class NotificationUtils implements AppConstants {
     private final Context context;
 
     public NotificationUtils(Context context) {
         this.context = context;
+    }
+
+    public void init() {
         if (!suscritedTopic() && Utils.hasConnected(context)) {
             suscribeTopic();
         }
+    }
+
+    public void setNotificationIcon(@DrawableRes int notificationIcon) {
+        prefs().edit().putInt(ICON_PREFS, notificationIcon).apply();
     }
 
     public void setOpenClass(Class<? extends Activity> openClass) {

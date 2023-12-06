@@ -14,8 +14,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 
@@ -27,11 +25,9 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
-import com.netfreemexico.notificationutils.Utils;
+import com.netfreemexico.notificationutils.util.Utils;
 import com.netfreemexico.notificationutils.constants.AppConstants;
 import com.netfreemexico.notificationutils.model.Data;
-
-import java.nio.charset.StandardCharsets;
 
 public class NotificationService extends FirebaseMessagingService implements AppConstants {
     private final Gson gson = new Gson();
@@ -48,18 +44,20 @@ public class NotificationService extends FirebaseMessagingService implements App
             String rawData = gson.toJson(message.getData());
             Data notificationData = gson.fromJson(rawData, Data.class);
             showNotification(notificationData);
-            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data",rawData));
         } catch (Exception e) {
-            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Data", e.getMessage()));
+            ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Error", e.getMessage()));
         }
 
+    }
+
+    private SharedPreferences prefs() {
+        return PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        prefs.edit().putString(FIREBASE_TOKEN, token).apply();
+        prefs().edit().putString(FIREBASE_TOKEN, token).apply();
     }
 
     private void showNotification(Data data) throws Exception {
@@ -121,12 +119,10 @@ public class NotificationService extends FirebaseMessagingService implements App
     }
 
     private String getOpenClass() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return prefs.getString(INTENT_CLASS, null);
+        return prefs().getString(INTENT_CLASS, null);
     }
 
-    private int getNotificationIcon() throws Exception {
-        ApplicationInfo info = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-        return info.metaData.getInt(NOTIFICATION_ICON);
+    private int getNotificationIcon() {
+        return prefs().getInt(ICON_PREFS, 0);
     }
 }

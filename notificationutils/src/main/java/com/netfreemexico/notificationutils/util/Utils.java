@@ -3,7 +3,7 @@
  *  Copyright (c) NetFreeMexico 2023 . All rights reserved.
  */
 
-package com.netfreemexico.notificationutils;
+package com.netfreemexico.notificationutils.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
