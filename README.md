@@ -1,2 +1,2 @@
-# Gen Utils
-Utils from NetFreeMX Gen app
+# Notification Utils
+Utils for Notification Sender App

@@ -1,10 +1,11 @@
 /*
- * Created by OCristian Gonzalez on 02/12/23 17:58
+ * Created by Cristian Gonzalez on 02/12/23 17:58
  *  Copyright (c) NetFreeMexico 2023 . All rights reserved.
  */
 
 package com.netfreemexico.notificationutils.service;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -31,7 +32,7 @@ import com.netfreemexico.notificationutils.model.Data;
 
 public class NotificationService extends FirebaseMessagingService implements AppConstants {
     private final Gson gson = new Gson();
-    public static final String NOTIFICATION_ICON = "notification_icon";
+    private NotificationManager notificationManager;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
@@ -96,7 +97,7 @@ public class NotificationService extends FirebaseMessagingService implements App
 
         if (data.getImageLUrl().isEmpty()) {
             NotificationCompat.BigTextStyle style = new NotificationCompat.BigTextStyle();
-            style.setSummaryText(data.getMessage());
+            style.bigText(data.getMessage());
             notification.setStyle(style);
         } else {
             NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle();
@@ -107,15 +108,20 @@ public class NotificationService extends FirebaseMessagingService implements App
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("NetFreeMexico", "NetFree", NotificationManager.IMPORTANCE_HIGH);
-            notificationManager().createNotificationChannel(channel);
+            @SuppressLint("WrongConstant") NotificationChannel channel = new NotificationChannel("NetFreeMexico", "NetFree", NotificationManager.IMPORTANCE_MAX);
+            channel.setDescription("Notifications From App Sender By Cristian Gonzalez");
+            getNotificationManager().createNotificationChannel(channel);
+            notification.setChannelId("NetFreeMexico");
         }
 
-        notificationManager().notify(Utils.randomId(), notification.build());
+        getNotificationManager().notify(Utils.randomId(), notification.build());
     }
 
-    private NotificationManager notificationManager() {
-        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    private NotificationManager getNotificationManager() {
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+        return notificationManager;
     }
 
     private String getOpenClass() {
